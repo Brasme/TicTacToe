@@ -5,15 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch (gdb)",
+            "name": "Launch (mingw gdb)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "D:\\Source\\TicTacToe3D\\build\\src\\ticTacToe\\Debug\\ticTacToe3D.exe",
+            "program": "${workspaceFolder}/build/src/ticTacToe/Debug/ticTacToe3D.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "miDebuggerPath": "/usr/bin/gdb",
             "MIMode": "gdb",
             "setupCommands": [
@@ -33,12 +33,12 @@
             "name": "Launch (vs)",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "D:\\Source\\TicTacToe3D\\build\\src\\ticTacToe\\Debug\\ticTacToe3D.exe",
+            "program": "${workspaceFolder}/build/src/ticTacToe/Debug/ticTacToe3D.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": false            
+            "externalConsole": true            
         },
         {
             "name": "Debug",
@@ -47,7 +47,7 @@
             "program": "D:/Source/TicTacToe3D/build/src/ticTacToeTest/Debug/ticTacToe3DTest.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": true
         }
