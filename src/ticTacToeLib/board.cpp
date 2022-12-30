@@ -1,23 +1,40 @@
 #include "ticTacToe3D/board.h"
+#include "ticTacToe3D/field.h"
+#include "ticTacToe3D/color.h"
+#include "ticTacToe3D/field.h"
 #include <sstream>
 
 namespace ttt {
+
     Field Board::Get(uint8_t row, uint8_t col) const
     {   
-        Field f;
-        // assert((row>=0) && (row<=2));
-        const size_t bitsIdx=3*(row*3+col);
-        f.state=(uint8_t)((state>>bitsIdx)&0x7);
+        Field f; 
+        if ((row > 2) || (col > 2))
+            return f;
+        const size_t bitsIdx=7*((size_t)row*3+col);
+        f.state=(uint8_t)((state>>bitsIdx)&0x7f);
         return f;
     }
 
     Board &Board::Set(uint8_t row, uint8_t col, const Field &field)
     {
-        const size_t bitsIdx=3*(row*3+col);
-        const uint64_t mask=0x7ull<<bitsIdx;
+        if (row > 2 || col > 2)
+            return *this;
+        const size_t bitsIdx=7*((size_t)row*3+col);
+        const uint64_t mask=0x7full<<bitsIdx;
         const uint64_t bits=(uint64_t)field.state<<bitsIdx;
         state = (state&~mask)|bits;
         return *this;        
+    }
+
+    Board& Board::Clr(uint8_t row, uint8_t col)
+    {
+        if (row > 2 || col > 2)
+            return *this;
+        const size_t bitsIdx = 7 * ((size_t)row * 3 + col);
+        const uint64_t mask = 0x7full << bitsIdx;
+        state = state & ~mask;
+        return *this;
     }
 
     std::string Board::ToStr() const
@@ -35,52 +52,106 @@ namespace ttt {
         return os;
     }
 
-    static const char *colorIdxChar="-ygbr...";
-    char Color::ToChar() const {
-        return colorIdxChar[idx&0x7];    
+    size_t Board::Solved() const
+    {
+        return Solved(ColorName::Yellow)+ Solved(ColorName::Green)+ Solved(ColorName::Blue)+ Solved(ColorName::Red);
+         
     }
 
-    TTT_API std::ostream &operator<<(std::ostream &os, const Color &c) { os << c.ToChar(); return os; }
-
-    static const FieldColors fieldToFieldColorIdx[128] = {
-        FieldColors(0, 0, 0), FieldColors(1, 0, 0), FieldColors(2, 0, 0), FieldColors(3, 0, 0), FieldColors(4, 0, 0), FieldColors(0, 1, 0), FieldColors(1, 1, 0), FieldColors(2, 1, 0),
-        FieldColors(3, 1, 0), FieldColors(4, 1, 0), FieldColors(0, 2, 0), FieldColors(1, 2, 0), FieldColors(2, 2, 0), FieldColors(3, 2, 0), FieldColors(4, 2, 0), FieldColors(0, 3, 0),
-        FieldColors(1, 3, 0), FieldColors(2, 3, 0), FieldColors(3, 3, 0), FieldColors(4, 3, 0), FieldColors(0, 4, 0), FieldColors(1, 4, 0), FieldColors(2, 4, 0), FieldColors(3, 4, 0),
-        FieldColors(4, 4, 0), FieldColors(0, 0, 1), FieldColors(1, 0, 1), FieldColors(2, 0, 1), FieldColors(3, 0, 1), FieldColors(4, 0, 1), FieldColors(0, 1, 1), FieldColors(1, 1, 1),
-        FieldColors(2, 1, 1), FieldColors(3, 1, 1), FieldColors(4, 1, 1), FieldColors(0, 2, 1), FieldColors(1, 2, 1), FieldColors(2, 2, 1), FieldColors(3, 2, 1), FieldColors(4, 2, 1),
-        FieldColors(0, 3, 1), FieldColors(1, 3, 1), FieldColors(2, 3, 1), FieldColors(3, 3, 1), FieldColors(4, 3, 1), FieldColors(0, 4, 1), FieldColors(1, 4, 1), FieldColors(2, 4, 1),
-        FieldColors(3, 4, 1), FieldColors(4, 4, 1), FieldColors(0, 0, 2), FieldColors(1, 0, 2), FieldColors(2, 0, 2), FieldColors(3, 0, 2), FieldColors(4, 0, 2), FieldColors(0, 1, 2),
-        FieldColors(1, 1, 2), FieldColors(2, 1, 2), FieldColors(3, 1, 2), FieldColors(4, 1, 2), FieldColors(0, 2, 2), FieldColors(1, 2, 2), FieldColors(2, 2, 2), FieldColors(3, 2, 2),
-        FieldColors(4, 2, 2), FieldColors(0, 3, 2), FieldColors(1, 3, 2), FieldColors(2, 3, 2), FieldColors(3, 3, 2), FieldColors(4, 3, 2), FieldColors(0, 4, 2), FieldColors(1, 4, 2),
-        FieldColors(2, 4, 2), FieldColors(3, 4, 2), FieldColors(4, 4, 2), FieldColors(0, 0, 3), FieldColors(1, 0, 3), FieldColors(2, 0, 3), FieldColors(3, 0, 3), FieldColors(4, 0, 3),
-        FieldColors(0, 1, 3), FieldColors(1, 1, 3), FieldColors(2, 1, 3), FieldColors(3, 1, 3), FieldColors(4, 1, 3), FieldColors(0, 2, 3), FieldColors(1, 2, 3), FieldColors(2, 2, 3),
-        FieldColors(3, 2, 3), FieldColors(4, 2, 3), FieldColors(0, 3, 3), FieldColors(1, 3, 3), FieldColors(2, 3, 3), FieldColors(3, 3, 3), FieldColors(4, 3, 3), FieldColors(0, 4, 3),
-        FieldColors(1, 4, 3), FieldColors(2, 4, 3), FieldColors(3, 4, 3), FieldColors(4, 4, 3), FieldColors(0, 0, 4), FieldColors(1, 0, 4), FieldColors(2, 0, 4), FieldColors(3, 0, 4),
-        FieldColors(4, 0, 4), FieldColors(0, 1, 4), FieldColors(1, 1, 4), FieldColors(2, 1, 4), FieldColors(3, 1, 4), FieldColors(4, 1, 4), FieldColors(0, 2, 4), FieldColors(1, 2, 4),
-        FieldColors(2, 2, 4), FieldColors(3, 2, 4), FieldColors(4, 2, 4), FieldColors(0, 3, 4), FieldColors(1, 3, 4), FieldColors(2, 3, 4), FieldColors(3, 3, 4), FieldColors(4, 3, 4),
-        FieldColors(0, 4, 4), FieldColors(1, 4, 4), FieldColors(2, 4, 4), FieldColors(3, 4, 4), FieldColors(4, 4, 4), FieldColors(0, 0, 0), FieldColors(0, 0, 0), FieldColors(0, 0, 0)};
-
-    std::string FieldColors::ToStr() const
+    static size_t numSolved(const Colors& a, const Colors& b, const Colors& c, uint8_t i)
     {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
+        size_t n = 0;
+        n += a[0].idx == i ? (b[0].idx == i && c[0].idx == i ? 1 : 0) + (b[1].idx == i && c[2].idx == i ? 1 : 0) : 0;
+        n += a[1].idx == i ? (b[1].idx == i && c[1].idx == i ? 1 : 0) : 0;
+        n += a[2].idx == i ? (b[2].idx == i && c[2].idx == i ? 1 : 0) + (b[1].idx == i && c[0].idx == i ? 1 : 0) : 0;
+        return n;
     }
 
-    std::ostream &operator<<(std::ostream &os, const FieldColors &c)
+    static size_t numSolved(const Colors& a, uint8_t i)
     {
-        os << c.colorIdx[0] << c.colorIdx[1] << c.colorIdx[2];
-        return os;
+        return a[0].idx == i && a[1].idx == i && a[2].idx == i ? 1 : 0;        
     }
 
-    std::ostream &operator<<(std::ostream &os, const Field &c)
+    size_t Board::Solved(const Color& color) const
     {
-        os << c.Colors();
-        return os;
+        const uint8_t i = color.idx;
+        if (i == 0 || i > 4)
+            return 0;
+
+        size_t n=0;
+
+        // Check along columns
+        for (uint8_t row = 0; row < 3; ++row) {
+            n += numSolved(Get(row, 0).Colors(), Get(row, 1).Colors(), Get(row, 2).Colors(), i);
+        };
+        
+        // Check along rows
+        for (uint8_t col = 0; col < 3; ++col) {
+            n += numSolved(Get(0, col).Colors(), Get(1, col).Colors(), Get(2, col).Colors(), i);
+        };
+
+        // Check vertically
+        for (uint8_t row = 0; row < 3; ++row) {
+            for (uint8_t col = 0; col < 3; ++col) {
+                n += numSolved(Get(row, col).Colors(), i);
+            }
+        }
+
+        // Check along diagonals
+        n += numSolved(Get(0, 0).Colors(), Get(1, 1).Colors(), Get(2, 2).Colors(), i);
+        n += numSolved(Get(2, 0).Colors(), Get(1, 1).Colors(), Get(0, 2).Colors(), i);
+        
+        return n;
     }
     
-    const FieldColors &Field::Colors() const
+    
+    size_t Board::Num() const
     {
-        return fieldToFieldColorIdx[state&0x7f];
+        size_t n = 0;
+        Field f;
+        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx+=7) {
+            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
+            n += f.Num();
+        }
+        return n;
+    }
+
+    size_t Board::Num(uint8_t vIdx) const
+    {
+        if (vIdx > 2)
+            return 0;
+        size_t n = 0;
+        Field f;
+        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
+            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
+            n += f.Num(vIdx);
+        }
+        return n;
+    }
+
+    size_t Board::Num(const Color& c) const
+    {
+        if (c.idx > 4)
+            return 0;
+        size_t n = 0;
+        Field f;
+        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
+            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
+            n += f.Num(c);
+        }
+        return n;
+    }
+
+    size_t Board::Num(uint8_t vIdx,const Color& c) const
+    {
+        if (c.idx > 4)
+            return 0;
+        size_t n = 0;
+        Field f;
+        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
+            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
+            n += f.Num(vIdx,c);
+        }
+        return n;
     }
 }

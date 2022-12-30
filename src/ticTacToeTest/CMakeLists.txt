@@ -7,7 +7,11 @@ include(CMakeDependentOption)
 include(GNUInstallDirs)
 
 enable_testing()
-add_executable(${PROJECT_NAME} board_test.cpp lib_test.cpp)
+add_executable(${PROJECT_NAME} 
+    color_test.cpp
+    field_test.cpp 
+    board_test.cpp 
+    lib_test.cpp)
 target_link_libraries(${PROJECT_NAME} ticTacToe3DLib gtest gtest_main)
 
 if(BUILD_SHARED_LIBS)
