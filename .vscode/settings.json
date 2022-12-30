@@ -24,5 +24,8 @@
     "gtest-adapter.debugConfig": [
         "Debug"
     ],
-    "gtest-adapter.supportLocation": true
+    "gtest-adapter.supportLocation": true,
+    "files.associations": {
+        "iosfwd": "cpp"
+    }
 }
