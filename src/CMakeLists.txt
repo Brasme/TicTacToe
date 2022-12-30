@@ -1,0 +1,3 @@
+add_subdirectory(ticTacToeLib)
+add_subdirectory(ticTacToeTest)
+add_subdirectory(ticTacToe)
