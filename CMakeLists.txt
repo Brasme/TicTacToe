@@ -6,7 +6,7 @@ option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
 option(INSTALL_GTEST "Enable installation of googletest" OFF)
 option(GTEST_HAS_ABSL "Use Abseil and RE2 in gtest" OFF)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-option(BUILD_SHARED_LIBS "Use shared libraries" ON)
+option(BUILD_SHARED_LIBS "Use shared libraries" OFF)
 
 add_subdirectory(modules/googletest)
 add_subdirectory(src)

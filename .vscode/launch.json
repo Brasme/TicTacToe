@@ -5,17 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "Launch (gdb)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/ticTacToe3D.exe",
+            "program": "D:\\Source\\TicTacToe3D\\build\\src\\ticTacToe\\Debug\\ticTacToe3D.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
+            "miDebuggerPath": "/usr/bin/gdb",
             "MIMode": "gdb",
-            "miDebuggerPath": "/path/to/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -30,16 +30,26 @@
             ]
         },
         {
-            "name": "Debug",
-            "type": "cppdbg",
+            "name": "Launch (vs)",
+            "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/ticTacToe3DTest.out",
+            "program": "D:\\Source\\TicTacToe3D\\build\\src\\ticTacToe\\Debug\\ticTacToe3D.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${fileDirname}",
             "environment": [],
-            "externalConsole": true,
-            "MIMode": "lldb"
+            "externalConsole": false            
+        },
+        {
+            "name": "Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "D:/Source/TicTacToe3D/build/src/ticTacToeTest/Debug/ticTacToe3DTest.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": true
         }
     ]
 }
