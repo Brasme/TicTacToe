@@ -1,7 +1,9 @@
 #pragma once
 
 #if defined(_WIN32)
-#  if defined(EXPORTING_ticTacToeLib)
+#  if !defined(ticTacToe3DLib_SHARED)
+#    define TTT_API
+#  elif defined(ticTacToe3DLib_EXPORTS)
 #    define TTT_API __declspec(dllexport)
 #  else
 #    define TTT_API __declspec(dllimport)
@@ -11,5 +13,5 @@
 #endif
 
 namespace ttt {
-    const char * TTT_API version();
+    TTT_API const char * version();
 }
