@@ -2,7 +2,7 @@
 
 Version 1.0.0 - Playable and useful for future AI/analyze
 
-SO far - just a console app :
+So far - just a console app :
 
 
         %> h
@@ -14,9 +14,9 @@ SO far - just a console app :
         Moves: 0
         r\c| 0 | 1 | 2 |
         ===+===+===+===+
-        0 |---|---|---|
-        1 |---|---|---|
-        2 |---|---|---|
+         0 |---|---|---|
+         1 |---|---|---|
+         2 |---|---|---|
         ===+===+===+===+
         P#0 -> :   0: 3*"y--",  1: 3*"-y-",  2: 3*"--y" : #=0, solved=0
         P#1    :   0: 3*"g--",  1: 3*"-g-",  2: 3*"--g" : #=0, solved=0
@@ -24,13 +24,15 @@ SO far - just a console app :
         P#3    :   0: 3*"r--",  1: 3*"-r-",  2: 3*"--r" : #=0, solved=0
         %> 
 
+        ...
+
 
         Moves: 23
         r\c| 0 | 1 | 2 |
         ===+===+===+===+
-        0 |ggg|yyy|bbb|
-        1 |gg-|yy-|bbb|
-        2 |rg-|ry-|rrr|
+         0 |ggg|yyy|bbb|
+         1 |gg-|yy-|bbb|
+         2 |rg-|ry-|rrr|
         ===+===+===+===+
         P#0    :   0: 1*"y--",  1: 0*"-y-",  2: 2*"--y" : #=6, solved=2
         P#1    :   0: 1*"g--",  1: 0*"-g-",  2: 2*"--g" : #=6, solved=2
@@ -42,9 +44,9 @@ SO far - just a console app :
         Moves: 24
         r\c| 0 | 1 | 2 |
         ===+===+===+===+
-        0 |ggg|yyy|bbb|
-        1 |gg-|yy-|bbb|
-        2 |rgr|ry-|rrr|
+         0 |ggg|yyy|bbb|
+         1 |gg-|yy-|bbb|
+         2 |rgr|ry-|rrr|
         ===+===+===+===+
         P#0 -> :   0: 1*"y--",  1: 0*"-y-",  2: 2*"--y" : #=6, solved=2
         P#1    :   0: 1*"g--",  1: 0*"-g-",  2: 2*"--g" : #=6, solved=2
