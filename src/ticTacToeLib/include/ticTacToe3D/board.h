@@ -23,8 +23,8 @@ namespace ttt {
         Board& Clr(uint8_t row, uint8_t col);
         Board& Clr() { state = 0; return *this; }
 
-        std::string ToStr() const;
-        std::ostream& ToStr(std::ostream& os) const;
+        std::string ToStr(bool showIndex=false) const;
+        std::ostream& ToStr(std::ostream& os, bool showIndex = false) const;
 
         size_t Solved() const;
         size_t Solved(const Color& color) const;

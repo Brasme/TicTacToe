@@ -24,31 +24,36 @@ namespace ttt {
 
     std::ostream &operator<<(std::ostream &os, const Field &c)
     {
-        os << c.Colors();
+        os << c.ToColors();
         return os;
     }
     
-    Field::Field(const ttt::Colors& c): state(V(c.colors[0].idx) + V(c.colors[1].idx) * 5 + V(c.colors[2].idx) * 25) 
-    {
-    }
-
-    Field::Field(const ttt::Color& c0, const ttt::Color& c1, const ttt::Color& c2) : state(V(c0.idx)+V(c1.idx)*5+V(c2.idx)*25)
-    {
-    }
-
     bool Field::operator ==(const Field& o) const
     {
         return state == o.state;
     }
 
-    const Colors &Field::Colors() const
+    const Colors &Field::ToColors() const
     {
         return fieldToColors[state&0x7f];
     }
 
     Field& Field::Set(uint8_t idx, const Color& c)
     {
-        state = Field(ttt::Colors(*this).Set(idx, c)).state;
+        state = Field(Colors(*this).Set(idx, c)).state;
+        return *this;
+    }
+
+    Field& Field::Add(const Field& f)
+    {
+        Colors c0(ToColors());
+        const Colors& c1 = f.ToColors();
+        for (uint8_t vIdx = 0; vIdx < 3; ++vIdx) {
+            const uint8_t cIdx = c1[vIdx].idx;
+            if (cIdx > 0)
+                c0[vIdx].idx = cIdx;
+        }
+        state = Field(c0).state;
         return *this;
     }
 

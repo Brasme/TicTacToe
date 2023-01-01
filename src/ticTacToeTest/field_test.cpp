@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #include "ticTacToe3D/field.h"
 
+#include <sstream>
+
 using namespace ttt;
 TEST(field, init) {
     Field f;
@@ -17,10 +19,19 @@ TEST(field, construct)
     f = Field(2, 3, 4);
     EXPECT_EQ(f.state, 2 + 3 * 5 + 4 * 25);
     EXPECT_EQ(f.ToStr(), "gbr");
-}
 
-#include "ticTacToe3D/color.h"
-#include <sstream>
+    Field f0 = Field(0,ColorName::Blue);
+    EXPECT_EQ(f0.ToStr(), "b--");
+
+    Field f1 = Field(1,ColorName::Red);
+    EXPECT_EQ(f1.ToStr(), "-r-");
+
+    Field f2 = Field(2,ColorName::Green);
+    EXPECT_EQ(f2.ToStr(), "--g");
+
+    f.Add(f1).Add(f2);
+    EXPECT_EQ(f0.ToStr(), "grg");
+}
 
 TEST(field, stream)
 {

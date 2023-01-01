@@ -37,18 +37,28 @@ namespace ttt {
         return *this;
     }
 
-    std::string Board::ToStr() const
+    std::string Board::ToStr(bool showIndex) const
     {
         std::stringstream ss;
-        ToStr(ss);
+        ToStr(ss,showIndex);
         return ss.str();
     }
 
-    std::ostream& Board::ToStr(std::ostream& os) const 
+    std::ostream& Board::ToStr(std::ostream& os,bool showIndex) const 
     {
-        for (uint8_t row=0;row<3;++row) {
-            os << Get(row,0) << ',' << Get(row,1) << ',' << Get(row,2) << "\n";            
-        }    
+        if (showIndex) {
+            os << "r\\c| 0 | 1 | 2 |\n";
+            os << "===+===+===+===+\n";
+            for (uint8_t row = 0; row < 3; ++row) {
+                os << ' ' << (int)row << " |" << Get(row, 0) << '|' << Get(row, 1) << '|' << Get(row, 2) << "|\n";
+            }
+            os << "===+===+===+===+\n";
+            return os;
+        }
+        
+        for (uint8_t row = 0; row < 3; ++row) {
+            os << Get(row, 0) << ',' << Get(row, 1) << ',' << Get(row, 2) << "\n";
+        }
         return os;
     }
 
@@ -82,24 +92,24 @@ namespace ttt {
 
         // Check along columns
         for (uint8_t row = 0; row < 3; ++row) {
-            n += numSolved(Get(row, 0).Colors(), Get(row, 1).Colors(), Get(row, 2).Colors(), i);
+            n += numSolved(Get(row, 0).ToColors(), Get(row, 1).ToColors(), Get(row, 2).ToColors(), i);
         };
         
         // Check along rows
         for (uint8_t col = 0; col < 3; ++col) {
-            n += numSolved(Get(0, col).Colors(), Get(1, col).Colors(), Get(2, col).Colors(), i);
+            n += numSolved(Get(0, col).ToColors(), Get(1, col).ToColors(), Get(2, col).ToColors(), i);
         };
 
         // Check vertically
         for (uint8_t row = 0; row < 3; ++row) {
             for (uint8_t col = 0; col < 3; ++col) {
-                n += numSolved(Get(row, col).Colors(), i);
+                n += numSolved(Get(row, col).ToColors(), i);
             }
         }
 
         // Check along diagonals
-        n += numSolved(Get(0, 0).Colors(), Get(1, 1).Colors(), Get(2, 2).Colors(), i);
-        n += numSolved(Get(2, 0).Colors(), Get(1, 1).Colors(), Get(0, 2).Colors(), i);
+        n += numSolved(Get(0, 0).ToColors(), Get(1, 1).ToColors(), Get(2, 2).ToColors(), i);
+        n += numSolved(Get(2, 0).ToColors(), Get(1, 1).ToColors(), Get(0, 2).ToColors(), i);
         
         return n;
     }

@@ -27,7 +27,7 @@ namespace ttt {
     std::ostream &operator<<(std::ostream &os, const Color &c) { os << c.ToChar(); return os; }
 
     Colors::Colors(const Field& f) {
-        *this = f.Colors();
+        *this = f.ToColors();
     }
 
     std::string Colors::ToStr() const
