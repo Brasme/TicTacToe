@@ -17,7 +17,7 @@ namespace ttt {
         explicit Field(const Color& c0, const Color& c1, const Color& c2) : state(V(c0.idx) + V(c1.idx) * 5 + V(c2.idx) * 25) {}
         explicit Field(uint8_t idx,const Color& c) : state(V(c.idx)*P(idx)) { }
 
-        bool operator ==(const Field& o) const;
+        bool operator ==(const Field& o) const { return state == o.state; }
         bool operator !=(const Field& o) const { return !operator==(o); }
 
         uint8_t state;

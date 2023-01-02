@@ -14,11 +14,31 @@ namespace ttt {
 #include <ostream>
 
 namespace ttt {
+    
     struct TTT_API Board {
-        Board() : state(0) {}
-        explicit Board(const uint64_t &v) : state(v) {}
-        uint64_t state;
-        Field Get(uint8_t row,uint8_t col) const;
+        struct Row {
+            Row() {}
+            explicit Row(const std::string& state) { FromState(state); }
+            Field column[3];
+            Field& operator[](uint8_t col) { return column[col]; }
+            const Field& operator[](uint8_t col) const { return column[col]; }
+            std::string ToState() const;
+            std::ostream& ToState(std::ostream &os) const;
+            Row& FromState(const std::string& state);
+        };
+        
+        Board() {}
+        explicit Board(const std::string &state) {}
+        Row     rows[3];
+        uint8_t playerIdx;
+        uint8_t pieces[4];
+
+        Field& At(uint8_t row, uint8_t col) { return rows[row][col]; }
+        const Field& At(uint8_t row, uint8_t col) const { return rows[row][col]; }
+
+        Row& operator[](uint8_t row) { return rows[row]; }
+        const Row& operator[](uint8_t row) const { return rows[row]; }
+
         Board& Set(uint8_t row,uint8_t col,const Field& field);
         Board& Clr(uint8_t row, uint8_t col);
         Board& Clr() { state = 0; return *this; }

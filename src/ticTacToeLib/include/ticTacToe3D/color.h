@@ -4,10 +4,12 @@
 #include "ticTacToe3D/lib.h"
 
 namespace ttt {
-    struct TTT_API Field;
     struct TTT_API Color;
     struct TTT_API Colors;
 }
+
+#include "ticTacToe3D/field.h"
+#include "ticTacToe3D/base5x3.h"
 
 #include <stdint.h>
 #include <string>
@@ -23,7 +25,7 @@ namespace ttt {
     };
     
     /// @brief Color 0='-' 1='y'(yellow), 2='g'(green), 3='b'(blue), 4='r'(red)
-    struct TTT_API Color {
+    struct TTT_API Color : Base5x3 {
         Color() : idx(0) {}
         Color(const ColorName& c) : idx(NameToIdx(c)) {} // Let this pass as non-explicit to allow direct conversion
         explicit Color(int i) : idx(i<0?0:i>4?0:(uint8_t)i) {}

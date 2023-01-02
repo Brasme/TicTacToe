@@ -28,11 +28,6 @@ namespace ttt {
         return os;
     }
     
-    bool Field::operator ==(const Field& o) const
-    {
-        return state == o.state;
-    }
-
     const Colors &Field::ToColors() const
     {
         return fieldToColors[state&0x7f];
