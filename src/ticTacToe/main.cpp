@@ -238,7 +238,7 @@ int main(int argc,char *argv[])
                 }
                 Field field;
                 if (ok) {
-                    field = state.board.Get(row, col);
+                    field = state.board[row][col];
                     ok = field.Num(piece) == 0;
                     if (!ok) std::cout << "Error: There is already a piece on c/r = " << col << '/' << row << "\n";
                 }

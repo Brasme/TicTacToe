@@ -7,6 +7,7 @@ include(CMakeDependentOption)
 include(GNUInstallDirs)
 
 add_library(${PROJECT_NAME} 
+	base5.cpp   include/ticTacToe3D/base5.h 
 	color.cpp   include/ticTacToe3D/color.h 
 	field.cpp   include/ticTacToe3D/field.h 
 	board.cpp   include/ticTacToe3D/board.h 

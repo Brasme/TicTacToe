@@ -6,35 +6,17 @@
 
 namespace ttt {
 
-    Field Board::Get(uint8_t row, uint8_t col) const
-    {   
-        Field f; 
-        if ((row > 2) || (col > 2))
-            return f;
-        const size_t bitsIdx=7*((size_t)row*3+col);
-        f.state=(uint8_t)((state>>bitsIdx)&0x7f);
-        return f;
-    }
-
-    Board &Board::Set(uint8_t row, uint8_t col, const Field &field)
+    uint64_t Board::state() const
     {
-        if (row > 2 || col > 2)
-            return *this;
-        const size_t bitsIdx=7*((size_t)row*3+col);
-        const uint64_t mask=0x7full<<bitsIdx;
-        const uint64_t bits=(uint64_t)field.state<<bitsIdx;
-        state = (state&~mask)|bits;
-        return *this;        
-    }
-
-    Board& Board::Clr(uint8_t row, uint8_t col)
-    {
-        if (row > 2 || col > 2)
-            return *this;
-        const size_t bitsIdx = 7 * ((size_t)row * 3 + col);
-        const uint64_t mask = 0x7full << bitsIdx;
-        state = state & ~mask;
-        return *this;
+        uint64_t s = 0;
+        for (uint8_t row = 0; row < 3; row++) {
+            const Row& r = rows[row];
+            for (uint8_t col = 0; col < 3; col++) {
+                const Field& f = r[col];
+                s = s * 125ull + (uint64_t)f.state;
+            }
+        }
+        return s;
     }
 
     std::string Board::ToStr(bool showIndex) const
@@ -50,14 +32,16 @@ namespace ttt {
             os << "r\\c| 0 | 1 | 2 |\n";
             os << "===+===+===+===+\n";
             for (uint8_t row = 0; row < 3; ++row) {
-                os << ' ' << (int)row << " |" << Get(row, 0) << '|' << Get(row, 1) << '|' << Get(row, 2) << "|\n";
+                const Row& r = rows[row];
+                os << ' ' << (int)row << " |" << r[0] << '|' << r[1] << '|' << r[2] << "|\n";
             }
             os << "===+===+===+===+\n";
             return os;
         }
         
         for (uint8_t row = 0; row < 3; ++row) {
-            os << Get(row, 0) << ',' << Get(row, 1) << ',' << Get(row, 2) << "\n";
+            const Row& r = rows[row];
+            os << r[0] << ',' << r[1] << ',' << r[1] << "\n";
         }
         return os;
     }
@@ -92,24 +76,24 @@ namespace ttt {
 
         // Check along columns
         for (uint8_t row = 0; row < 3; ++row) {
-            n += numSolved(Get(row, 0).ToColors(), Get(row, 1).ToColors(), Get(row, 2).ToColors(), i);
+            n += numSolved(rows[row][0].ToColors(), rows[row][1].ToColors(), rows[row][2].ToColors(), i);
         };
         
         // Check along rows
         for (uint8_t col = 0; col < 3; ++col) {
-            n += numSolved(Get(0, col).ToColors(), Get(1, col).ToColors(), Get(2, col).ToColors(), i);
+            n += numSolved(rows[0][col].ToColors(), rows[1][col].ToColors(), rows[2][col].ToColors(), i);
         };
 
         // Check vertically
         for (uint8_t row = 0; row < 3; ++row) {
             for (uint8_t col = 0; col < 3; ++col) {
-                n += numSolved(Get(row, col).ToColors(), i);
+                n += numSolved(rows[row][col].ToColors(), i);
             }
         }
 
         // Check along diagonals
-        n += numSolved(Get(0, 0).ToColors(), Get(1, 1).ToColors(), Get(2, 2).ToColors(), i);
-        n += numSolved(Get(2, 0).ToColors(), Get(1, 1).ToColors(), Get(0, 2).ToColors(), i);
+        n += numSolved(rows[0][0].ToColors(), rows[1][1].ToColors(), rows[2][2].ToColors(), i);
+        n += numSolved(rows[2][0].ToColors(), rows[1][1].ToColors(), rows[0][2].ToColors(), i);
         
         return n;
     }
@@ -118,11 +102,13 @@ namespace ttt {
     size_t Board::Num() const
     {
         size_t n = 0;
-        Field f;
-        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx+=7) {
-            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
-            n += f.Num();
-        }
+        for (uint8_t row = 0; row < 3; ++row) {
+            const Row& r = rows[row]; 
+            for (uint8_t col = 0; col < 3; ++col) {
+                const Field& f = r[col];
+                n += f.Num();
+            }
+        }            
         return n;
     }
 
@@ -130,12 +116,15 @@ namespace ttt {
     {
         if (vIdx > 2)
             return 0;
-        size_t n = 0;
-        Field f;
-        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
-            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
-            n += f.Num(vIdx);
+        size_t n = 0;        
+        for (uint8_t row = 0; row < 3; ++row) {
+            const Row& r = rows[row];
+            for (uint8_t col = 0; col < 3; ++col) {
+                const Field& f = r[col];
+                n += f.Num(vIdx);
+            }
         }
+
         return n;
     }
 
@@ -143,11 +132,13 @@ namespace ttt {
     {
         if (c.idx > 4)
             return 0;
-        size_t n = 0;
-        Field f;
-        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
-            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
-            n += f.Num(c);
+        size_t n = 0;        
+        for (uint8_t row = 0; row < 3; ++row) {
+            const Row& r = rows[row];
+            for (uint8_t col = 0; col < 3; ++col) {
+                const Field& f = r[col];
+                n += f.Num(c);
+            }
         }
         return n;
     }
@@ -156,11 +147,13 @@ namespace ttt {
     {
         if (c.idx > 4)
             return 0;
-        size_t n = 0;
-        Field f;
-        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
-            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
-            n += f.Num(vIdx,c);
+        size_t n = 0;        
+        for (uint8_t row = 0; row < 3; ++row) {
+            const Row& r = rows[row];
+            for (uint8_t col = 0; col < 3; ++col) {
+                const Field& f = r[col];
+                n += f.Num(vIdx,c);
+            }
         }
         return n;
     }

@@ -2,6 +2,11 @@
 #define TTT_FIELD_H_
 
 #include "ticTacToe3D/lib.h"
+
+namespace ttt {
+    struct TTT_API Field;
+}
+
 #include "ticTacToe3D/color.h"
 
 #include <stdint.h>
