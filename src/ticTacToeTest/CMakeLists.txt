@@ -8,6 +8,7 @@ include(GNUInstallDirs)
 
 enable_testing()
 add_executable(${PROJECT_NAME} 
+    board_num_encode.cpp
     color_test.cpp
     field_test.cpp 
     board_test.cpp 

@@ -2,69 +2,134 @@
 #include "ticTacToe3D/field.h"
 #include "ticTacToe3D/color.h"
 #include "ticTacToe3D/field.h"
-#include <sstream>
+
+#include <chrono>  // chrono::system_clock
+#include <ctime>   // localtime
+#include <sstream> // stringstream
+#include <iomanip> // put_time
+#include <string>  // string
+#include <time.h>
 
 namespace ttt {
 
-    Field Board::Get(uint8_t row, uint8_t col) const
-    {   
-        Field f; 
-        if ((row > 2) || (col > 2))
-            return f;
-        const size_t bitsIdx=7*((size_t)row*3+col);
-        f.state=(uint8_t)((state>>bitsIdx)&0x7f);
-        return f;
+    Board::Board(const std::string& state) : playerIdx(0) {
+        stateStr(state);
     }
 
-    Board &Board::Set(uint8_t row, uint8_t col, const Field &field)
+    Board::Board(const uint64_t& s): playerIdx(0)
     {
-        if (row > 2 || col > 2)
-            return *this;
-        const size_t bitsIdx=7*((size_t)row*3+col);
-        const uint64_t mask=0x7full<<bitsIdx;
-        const uint64_t bits=(uint64_t)field.state<<bitsIdx;
-        state = (state&~mask)|bits;
-        return *this;        
+        state(s);
     }
-
-    Board& Board::Clr(uint8_t row, uint8_t col)
-    {
-        if (row > 2 || col > 2)
-            return *this;
-        const size_t bitsIdx = 7 * ((size_t)row * 3 + col);
-        const uint64_t mask = 0x7full << bitsIdx;
-        state = state & ~mask;
+    
+    Board& Board::stateStr(const std::string& state) {
+        
+        std::size_t pos = state.find(",P:");
+        if (pos != std::string::npos) {
+            std::size_t end = state.find(",",pos+3);
+            if (end != std::string::npos) {
+                std::string player = state.substr(pos + 3, end - pos - 3);
+                playerIdx = std::stoi(player);
+            }
+        }
+        
+        pos = state.find(",L:");
+        if (pos != std::string::npos) {
+            pos = state.find('{',pos+1);
+            for (uint8_t row = 0; pos != std::string::npos && row < 3; ++row) {
+                for (uint8_t col = 0; pos != std::string::npos && col < 3; ++col) {
+                    char startChar = col==0?'{':',';
+                    char endChar = col==2?'}':',';
+                    pos = state.find(startChar, pos + 1);                    
+                    std::size_t end = state.find(endChar, pos + 1);
+                    if (pos != std::string::npos && end != std::string::npos) {
+                        std::string fieldStr = state.substr(pos + 1, end - pos - 1);
+                        rows[row][col] = Field(Colors(fieldStr));
+                    }
+                }
+            }            
+        }
         return *this;
     }
 
-    std::string Board::ToStr(bool showIndex) const
+    std::string Board::stateStr() const
     {
+        auto now = std::chrono::system_clock::now();
+        auto t = std::chrono::system_clock::to_time_t(now);
+
+        struct tm tmBuf;
+        localtime_s(&tmBuf, &t);
         std::stringstream ss;
-        ToStr(ss,showIndex);
+        ss << "B";
+        ss << ",T:" << std::put_time(&tmBuf, "%Y-%m-%d %X");
+        ss << ",P:" << (int)playerIdx;
+        
+        ss << ",L:";
+        for (uint8_t row = 0; row < 3; ++row) {
+            ss << (row == 0 ? '{' : ',');
+            const Row& r = rows[row];
+            ss << '{' << r[0] << ',' << r[1] << ',' << r[2] << '}';
+        }
+        ss << '}';
         return ss.str();
     }
 
-    std::ostream& Board::ToStr(std::ostream& os,bool showIndex) const 
+    uint64_t Board::state() const
+    {
+        uint64_t s = 0;
+        uint8_t idx = 9;
+        while (idx > 0) {
+            idx--;
+            const Field& f = rows[idx/3][idx%3];
+            // s = s * 125ull + (uint64_t)f.state;            
+            s = s<<7 | (uint64_t)f.state;
+        }
+        return s;
+    }
+
+    Board& Board::state(const uint64_t &state)
+    {
+        uint64_t s = state;
+        for (uint8_t idx = 0; idx < 9;++idx) {
+            Field& f = rows[idx / 3][idx % 3];
+            // uint64_t ns = s / 125ull;
+            // f.state = (uint8_t)(s - ns * 125ull);
+            // s = ns; 
+            f.state = (uint8_t)(s & 0x7f);
+            s = s >> 7;                        
+        }
+        return *this;
+    }
+
+    std::string Board::toStr(bool showIndex) const
+    {
+        std::stringstream ss;
+        toStr(ss,showIndex);
+        return ss.str();
+    }
+
+    std::ostream& Board::toStr(std::ostream& os,bool showIndex) const 
     {
         if (showIndex) {
             os << "r\\c| 0 | 1 | 2 |\n";
             os << "===+===+===+===+\n";
             for (uint8_t row = 0; row < 3; ++row) {
-                os << ' ' << (int)row << " |" << Get(row, 0) << '|' << Get(row, 1) << '|' << Get(row, 2) << "|\n";
+                const Row& r = rows[row];
+                os << ' ' << (int)row << " |" << r[0] << '|' << r[1] << '|' << r[2] << "|\n";
             }
             os << "===+===+===+===+\n";
             return os;
         }
         
         for (uint8_t row = 0; row < 3; ++row) {
-            os << Get(row, 0) << ',' << Get(row, 1) << ',' << Get(row, 2) << "\n";
+            const Row& r = rows[row];
+            os << r[0] << ',' << r[1] << ',' << r[2] << "\n";
         }
         return os;
     }
 
-    size_t Board::Solved() const
+    size_t Board::solved() const
     {
-        return Solved(ColorName::Yellow)+ Solved(ColorName::Green)+ Solved(ColorName::Blue)+ Solved(ColorName::Red);
+        return solved(ColorName::Yellow)+ solved(ColorName::Green)+ solved(ColorName::Blue)+ solved(ColorName::Red);
          
     }
 
@@ -82,7 +147,7 @@ namespace ttt {
         return a[0].idx == i && a[1].idx == i && a[2].idx == i ? 1 : 0;        
     }
 
-    size_t Board::Solved(const Color& color) const
+    size_t Board::solved(const Color& color) const
     {
         const uint8_t i = color.idx;
         if (i == 0 || i > 4)
@@ -92,75 +157,84 @@ namespace ttt {
 
         // Check along columns
         for (uint8_t row = 0; row < 3; ++row) {
-            n += numSolved(Get(row, 0).ToColors(), Get(row, 1).ToColors(), Get(row, 2).ToColors(), i);
+            n += numSolved(rows[row][0].toColors(), rows[row][1].toColors(), rows[row][2].toColors(), i);
         };
         
         // Check along rows
         for (uint8_t col = 0; col < 3; ++col) {
-            n += numSolved(Get(0, col).ToColors(), Get(1, col).ToColors(), Get(2, col).ToColors(), i);
+            n += numSolved(rows[0][col].toColors(), rows[1][col].toColors(), rows[2][col].toColors(), i);
         };
 
         // Check vertically
         for (uint8_t row = 0; row < 3; ++row) {
             for (uint8_t col = 0; col < 3; ++col) {
-                n += numSolved(Get(row, col).ToColors(), i);
+                n += numSolved(rows[row][col].toColors(), i);
             }
         }
 
         // Check along diagonals
-        n += numSolved(Get(0, 0).ToColors(), Get(1, 1).ToColors(), Get(2, 2).ToColors(), i);
-        n += numSolved(Get(2, 0).ToColors(), Get(1, 1).ToColors(), Get(0, 2).ToColors(), i);
+        n += numSolved(rows[0][0].toColors(), rows[1][1].toColors(), rows[2][2].toColors(), i);
+        n += numSolved(rows[2][0].toColors(), rows[1][1].toColors(), rows[0][2].toColors(), i);
         
         return n;
     }
     
     
-    size_t Board::Num() const
+    size_t Board::num() const
     {
         size_t n = 0;
-        Field f;
-        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx+=7) {
-            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
-            n += f.Num();
-        }
+        for (uint8_t row = 0; row < 3; ++row) {
+            const Row& r = rows[row]; 
+            for (uint8_t col = 0; col < 3; ++col) {
+                const Field& f = r[col];
+                n += f.num();
+            }
+        }            
         return n;
     }
 
-    size_t Board::Num(uint8_t vIdx) const
+    size_t Board::num(uint8_t vIdx) const
     {
         if (vIdx > 2)
             return 0;
-        size_t n = 0;
-        Field f;
-        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
-            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
-            n += f.Num(vIdx);
+        size_t n = 0;        
+        for (uint8_t row = 0; row < 3; ++row) {
+            const Row& r = rows[row];
+            for (uint8_t col = 0; col < 3; ++col) {
+                const Field& f = r[col];
+                n += f.num(vIdx);
+            }
+        }
+
+        return n;
+    }
+
+    size_t Board::num(const Color& c) const
+    {
+        if (c.idx > 4)
+            return 0;
+        size_t n = 0;        
+        for (uint8_t row = 0; row < 3; ++row) {
+            const Row& r = rows[row];
+            for (uint8_t col = 0; col < 3; ++col) {
+                const Field& f = r[col];
+                n += f.num(c);
+            }
         }
         return n;
     }
 
-    size_t Board::Num(const Color& c) const
+    size_t Board::num(uint8_t vIdx,const Color& c) const
     {
         if (c.idx > 4)
             return 0;
-        size_t n = 0;
-        Field f;
-        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
-            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
-            n += f.Num(c);
-        }
-        return n;
-    }
-
-    size_t Board::Num(uint8_t vIdx,const Color& c) const
-    {
-        if (c.idx > 4)
-            return 0;
-        size_t n = 0;
-        Field f;
-        for (size_t bitsIdx = 0; bitsIdx < 63; bitsIdx += 7) {
-            f.state = (uint8_t)((state >> bitsIdx) & 0x7f);
-            n += f.Num(vIdx,c);
+        size_t n = 0;        
+        for (uint8_t row = 0; row < 3; ++row) {
+            const Row& r = rows[row];
+            for (uint8_t col = 0; col < 3; ++col) {
+                const Field& f = r[col];
+                n += f.num(vIdx,c);
+            }
         }
         return n;
     }

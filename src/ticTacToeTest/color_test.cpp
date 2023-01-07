@@ -6,22 +6,22 @@ TEST(color, init)
 {
     Color c;
     EXPECT_EQ(c.idx, 0);
-    EXPECT_EQ(c.ToChar(), '-');
+    EXPECT_EQ(c.toChar(), '-');
 
-    c = Color(1);  EXPECT_EQ(c.idx, 1); EXPECT_EQ(c.ToChar(), 'y');
-    c = Color(2);  EXPECT_EQ(c.idx, 2); EXPECT_EQ(c.ToChar(), 'g');
-    c = Color(3);  EXPECT_EQ(c.idx, 3); EXPECT_EQ(c.ToChar(), 'b');
-    c = Color(4);  EXPECT_EQ(c.idx, 4); EXPECT_EQ(c.ToChar(), 'r');
-    c = Color(-1); EXPECT_EQ(c.idx, 0); EXPECT_EQ(c.ToChar(), '-');
-    c = Color(5);  EXPECT_EQ(c.idx, 0); EXPECT_EQ(c.ToChar(), '-');
+    c = Color(1);  EXPECT_EQ(c.idx, 1); EXPECT_EQ(c.toChar(), 'y');
+    c = Color(2);  EXPECT_EQ(c.idx, 2); EXPECT_EQ(c.toChar(), 'g');
+    c = Color(3);  EXPECT_EQ(c.idx, 3); EXPECT_EQ(c.toChar(), 'b');
+    c = Color(4);  EXPECT_EQ(c.idx, 4); EXPECT_EQ(c.toChar(), 'r');
+    c = Color(-1); EXPECT_EQ(c.idx, 0); EXPECT_EQ(c.toChar(), '-');
+    c = Color(5);  EXPECT_EQ(c.idx, 0); EXPECT_EQ(c.toChar(), '-');
 
-    c = ColorName::Yellow; EXPECT_EQ(c.idx, 1); EXPECT_EQ(c.ToChar(), 'y');
-    c = ColorName::Green;  EXPECT_EQ(c.idx, 2); EXPECT_EQ(c.ToChar(), 'g');
-    c = ColorName::Blue;   EXPECT_EQ(c.idx, 3); EXPECT_EQ(c.ToChar(), 'b');
-    c = ColorName::Red;    EXPECT_EQ(c.idx, 4); EXPECT_EQ(c.ToChar(), 'r');
-    c = ColorName::None;   EXPECT_EQ(c.idx, 0); EXPECT_EQ(c.ToChar(), '-');
+    c = ColorName::Yellow; EXPECT_EQ(c.idx, 1); EXPECT_EQ(c.toChar(), 'y');
+    c = ColorName::Green;  EXPECT_EQ(c.idx, 2); EXPECT_EQ(c.toChar(), 'g');
+    c = ColorName::Blue;   EXPECT_EQ(c.idx, 3); EXPECT_EQ(c.toChar(), 'b');
+    c = ColorName::Red;    EXPECT_EQ(c.idx, 4); EXPECT_EQ(c.toChar(), 'r');
+    c = ColorName::None;   EXPECT_EQ(c.idx, 0); EXPECT_EQ(c.toChar(), '-');
 
-    c.idx = 0xff; EXPECT_EQ(c.idx, 0xff); EXPECT_EQ(c.ToChar(), '-');
+    c.idx = 0xff; EXPECT_EQ(c.idx, 0xff); EXPECT_EQ(c.toChar(), '-');
 }
 
 TEST(color, stream)
@@ -34,7 +34,7 @@ TEST(color, stream)
 TEST(colors, init) {
     ttt::Colors fc;
     EXPECT_EQ(fc.colors[0].idx, 0);
-    EXPECT_EQ(fc.ToStr(), "---");
+    EXPECT_EQ(fc.toStr(), "---");
 }
 
 TEST(colors, stream) {
@@ -44,9 +44,9 @@ TEST(colors, stream) {
 }
 
 TEST(color, nameToIdx) {
-    EXPECT_EQ(Color::NameToIdx(ColorName::None), 0);
-    EXPECT_EQ(Color::NameToIdx(ColorName::Yellow), 1);
-    EXPECT_EQ(Color::NameToIdx(ColorName::Green), 2);
-    EXPECT_EQ(Color::NameToIdx(ColorName::Blue), 3);
-    EXPECT_EQ(Color::NameToIdx(ColorName::Red), 4);
+    EXPECT_EQ(Color::nameToIdx(ColorName::None), 0);
+    EXPECT_EQ(Color::nameToIdx(ColorName::Yellow), 1);
+    EXPECT_EQ(Color::nameToIdx(ColorName::Green), 2);
+    EXPECT_EQ(Color::nameToIdx(ColorName::Blue), 3);
+    EXPECT_EQ(Color::nameToIdx(ColorName::Red), 4);
 }
