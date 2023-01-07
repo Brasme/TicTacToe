@@ -82,6 +82,26 @@ void combinationsAllOf(size_t n, size_t m, const char ch, vector<string>& c, con
     }
 }
 
+TEST(board, state_string)
+{
+    Board b;
+    for (uint8_t r = 0; r < 3; r++) for (uint8_t c = 0; c < 3; c++) {
+        b[r][c].state = ((r+c)%5) + ((r + c+1) % 5)*5 + ((r + c + 2) % 5)*5;
+    }
+    EXPECT_EQ(b.toStr(), "-b-,y-y,ggy\ny-y,ggy,br-\nggy,br-,ry-\n");
+
+    b.playerIdx = 1;
+    std::string s = b.stateStr();
+    const char* dateStr = "2023-01-01 11:12:13";
+    for (size_t i = 0; dateStr[i]; ++i)
+        s[i + 4] = dateStr[i];
+    EXPECT_EQ(s, "B,T:2023-01-01 11:12:13,P:1,L:{{-b-,y-y,ggy},{y-y,ggy,br-},{ggy,br-,ry-}}");
+
+    Board newBoard(s);
+    EXPECT_EQ(newBoard.toStr(), "-b-,y-y,ggy\ny-y,ggy,br-\nggy,br-,ry-\n");
+    EXPECT_EQ(newBoard.playerIdx, 1);
+}
+
 struct Combinations : vector<string> {
     string toStr() const {
         stringstream ss;

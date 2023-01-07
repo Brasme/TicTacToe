@@ -34,21 +34,19 @@ namespace ttt {
         
         pos = state.find(",L:");
         if (pos != std::string::npos) {
-            std::size_t end = state.find(",", pos + 3);
-            std::string board = state.substr(pos + 3, end - pos - 3);
-            
-            uint8_t field = 0;
-            pos = board.find('{');
-            while (pos != std::string::npos && field<9) {
-                pos = board.find('{',pos+1);
-                end = board.find('}',pos+1);
-                if (pos != std::string::npos && end != std::string::npos) {
-                    std::string fieldStr = board.substr(pos + 1, end - pos - 1);
-                    rows[field / 3][field % 3] = Field(Colors(fieldStr));
+            pos = state.find('{',pos+1);
+            for (uint8_t row = 0; pos != std::string::npos && row < 3; ++row) {
+                for (uint8_t col = 0; pos != std::string::npos && col < 3; ++col) {
+                    char startChar = col==0?'{':',';
+                    char endChar = col==2?'}':',';
+                    pos = state.find(startChar, pos + 1);                    
+                    std::size_t end = state.find(endChar, pos + 1);
+                    if (pos != std::string::npos && end != std::string::npos) {
+                        std::string fieldStr = state.substr(pos + 1, end - pos - 1);
+                        rows[row][col] = Field(Colors(fieldStr));
+                    }
                 }
-            }
-            uint8_t row = 0;
-
+            }            
         }
         return *this;
     }
@@ -69,7 +67,7 @@ namespace ttt {
         for (uint8_t row = 0; row < 3; ++row) {
             ss << (row == 0 ? '{' : ',');
             const Row& r = rows[row];
-            ss << '{' << r[0] << ',' << r[1] << ',' << r[1] << '}';
+            ss << '{' << r[0] << ',' << r[1] << ',' << r[2] << '}';
         }
         ss << '}';
         return ss.str();
