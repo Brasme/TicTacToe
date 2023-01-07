@@ -94,4 +94,68 @@ extern "C" {
         }
         return (opt->optopt); /* dump back option letter */
     }
+
+    int parse_args_getopt_example_c(int argc, char* argv[])
+    {
+        struct getopt_t opt;
+        // put ':' at the starting of the string so compiler can distinguish between '?' and ':'
+        if (getopt_init(&opt, argc, argv, ":if:lrx") != 0)
+            return -1; // Failed to init
+
+        int option;
+        while ((option = getopt_parse(&opt)) != -1) { //get option from the getopt() method
+            switch (option) {
+                //For option i, r, l, print that these are options
+            case 'i':
+            case 'l':
+            case 'r':
+                printf("Given Option: %c\n", option);
+                break;
+            case 'f': //here f is used for some file name
+                printf("Given File: %s\n", opt.optarg);
+                break;
+            case ':':
+                printf("option needs a value\n");
+                break;
+            case '?': //used for some unknown options
+                printf("unknown option: %c\n", opt.optopt);
+                break;
+            }
+        }
+        for (; opt.optind < argc; opt.optind++) { //when some extra arguments are passed
+            printf("Given extra arguments: %s\n", argv[opt.optind]);
+        }
+        return 0;
+    }
+
+    int parse_args_getopt_example_cpp(int argc, char* argv[])
+    {
+        utils::GetOpt opt(argc, argv, ":if:lrx");
+
+        int option;
+        while ((option = opt.parse()) != -1) { //get option from the getopt() method
+            switch (option) {
+                //For option i, r, l, print that these are options
+            case 'i':
+            case 'l':
+            case 'r':
+                printf("Given Option: %c\n", option);
+                break;
+            case 'f': //here f is used for some file name
+                printf("Given File: %s\n", opt.optarg);
+                break;
+            case ':':
+                printf("option needs a value\n");
+                break;
+            case '?': //used for some unknown options
+                printf("unknown option: %c\n", opt.optopt);
+                break;
+            }
+        }
+        for (; opt.optind < argc; opt.optind++) { //when some extra arguments are passed
+            printf("Given extra arguments: %s\n", argv[opt.optind]);
+        }
+        return 0;
+    }
+
 }

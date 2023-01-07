@@ -15,22 +15,7 @@ namespace ttt {
 
 namespace ttt {
 
-    struct TTT_API BoardState {
-        BoardState() : playerIdx(0) { 
-            for (uint8_t r = 0; r < 3; ++r)
-                for (uint8_t c = 0; c < 3; ++c)
-                    fields[r][c] = 0;
-        }
-        explicit operator uint64_t() const {
-            uint64_t v=0;
-            for (uint8_t r = 0; r < 3; ++r)
-                for (uint8_t c = 0; c < 3; ++c)
-                    v = v * 125ull + (uint64_t)fields[r][c];
-        }
-        uint8_t playerIdx;
-        uint8_t fields[3][3];
-    };
-
+    
     struct TTT_API Board {
         struct Row {
             Row() {}

@@ -51,8 +51,11 @@ extern "C" {
     UTILS_API int getopt_init(struct getopt_t* opt, int argc, char* argv[], const char* ostr);
     UTILS_API int getopt_parse(struct getopt_t* opt);
 
+    UTILS_API int parse_args_getopt_example_c(int argc, char* argv[]);
+    UTILS_API int parse_args_getopt_example_cpp(int argc, char* argv[]);
+
 #ifdef __cplusplus
-} extern "C"
+} // extern "C"
 	
 namespace utils {
     struct UTILS_API GetOpt : ::getopt_t {

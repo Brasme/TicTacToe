@@ -8,6 +8,8 @@ include(GNUInstallDirs)
 
 add_library(${PROJECT_NAME} 
 	getopt.cpp  include/utils/getopt.h 
+	tokens.cpp  include/utils/tokens.h 
+	string.cpp  include/utils/string.h 
 	lib.cpp     include/utils/lib.h)
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

@@ -1,3 +1,4 @@
+#include "main.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -6,6 +7,9 @@
 #include "ticTacToe3D/board.h"
 #include "ticTacToe3D/color.h"
 #include "ticTacToe3D/field.h"
+
+#include "utils/getopt.h"
+#include "utils/tokens.h"
 
 using namespace ttt;
 
@@ -24,11 +28,11 @@ struct State {
             
             Piece() : pieceInfo(0) {}
             Piece(const Color &c,uint8_t vIdx,uint8_t num) : pieceInfo(c.idx | (vIdx<<3) | (num<<5)) {}
-            inline Field ToField() const { return Field(VIdx(), ToColor()); }
-            inline Color ToColor() const { return Color(pieceInfo & 0x7); }
-            inline uint8_t VIdx() const { return (pieceInfo & 0x18) >> 3; }
+            inline Field toField() const { return Field(vIdx(), toColor()); }
+            inline Color toColor() const { return Color(pieceInfo & 0x7); }
+            inline uint8_t vIdx() const { return (pieceInfo & 0x18) >> 3; }
             inline uint8_t num() const { return (pieceInfo & 0xe0) >> 5; }
-            inline bool Take() { 
+            inline bool take() { 
                 uint8_t num=(pieceInfo & 0xe0) >> 5;
                 if (num == 0) return false;
                 num--;
@@ -37,13 +41,14 @@ struct State {
             }
         };
         Piece piece[3];
-    } player[4];    
+    } player[4];
+
     uint8_t playerTurn;    
 
-    Player& GetPlayer() { return player[playerTurn]; }
-    const Player& GetPlayer() const { return player[playerTurn]; }
+    Player& getPlayer() { return player[playerTurn]; }
+    const Player& getPlayer() const { return player[playerTurn]; }
 
-    State& Clear(const Board& b,uint8_t turn = 0) {
+    State& clear(const Board& b,uint8_t turn = 0) {
         board = b;
         playerTurn = turn;
         for (uint8_t playerIdx = 0; playerIdx < 4; ++playerIdx) {
@@ -57,15 +62,15 @@ struct State {
         return *this;
     }
 
-    State& Clear(uint8_t playerTurn = 0) {  return Clear(Board(), playerTurn); }
+    State& clear(uint8_t playerTurn = 0) {  return clear(Board(), playerTurn); }
 
-    State(uint8_t playerTurn = 0) { Clear(playerTurn); }
-    State(const Board& board, uint8_t playerTurn = 0) { Clear(board, playerTurn); }
+    State(uint8_t playerTurn = 0) { clear(playerTurn); }
+    State(const Board& board, uint8_t playerTurn = 0) { clear(board, playerTurn); }
 };
 
 
 std::ostream& operator<<(std::ostream& os, const State::Player::Piece& piece) {
-    os << (int)piece.num() << "*\"" << piece.ToField() << '\"';
+    os << (int)piece.num() << "*\"" << piece.toField() << '\"';
     return os;
 }
 
@@ -88,86 +93,6 @@ std::ostream& operator<<(std::ostream& os, const State& state)
     return os;
 }
 
-#include <vector>
-#include <sstream>
-#include <algorithm>
-#include <locale>
-#include "main.h"
-
-namespace utils {
-    std::string& ltrim(std::string& str)
-    {
-        auto it2 = std::find_if(str.begin(), str.end(), [](char ch) { return !std::isspace<char>(ch, std::locale::classic()); });
-        str.erase(str.begin(), it2);
-        return str;
-    }
-
-    std::string& rtrim(std::string& str)
-    {
-        auto it1 = std::find_if(str.rbegin(), str.rend(), [](char ch) { return !std::isspace<char>(ch, std::locale::classic()); });
-        str.erase(it1.base(), str.end());
-        return str;
-    }
-
-    std::string& trim(std::string& str)
-    {
-        size_t len1 = str.length();
-        std::string::iterator i = std::unique(str.begin(), str.end(), [](auto lhs, auto rhs) { return lhs == rhs && lhs == ' '; });
-        str.erase(i, str.end());
-        ltrim(str);
-        rtrim(str);
-        return str;
-    }
-
-    struct Tokens : std::vector<std::string> {
-        char delim;
-        Tokens(char delimiter = ' ') : delim(delimiter) {}
-        Tokens(const std::string &str,char delimiter = ' ') : delim(delimiter) { tokenize(str); }
-
-        Tokens& tokenize(const std::string& str)
-        {
-            clear();
-            std::string s = str;
-            trim(s);
-            std::stringstream ss(s);
-            while (std::getline(ss, s, delim)) {
-                push_back(s);
-            }
-            return *this;
-        }
-        std::ostream& toStream(std::ostream& os) const {
-            os << '{';
-            for (auto it = begin(); it != end(); ++it) {
-                os << (it!=begin()? ",\"" : "\"") << *it << '\"';
-            }
-            os << '}';
-            return os;
-        }
-        std::string toStr() const {
-            std::stringstream ss;
-            toStream(ss);
-            return ss.str();
-        }
-        Tokens& toLower() {
-            for (auto it = begin(); it != end(); ++it) {
-                std::string& str = *it;
-                std::transform(str.begin(), str.end(), str.begin(),
-                    [](unsigned char c) { return std::tolower(c); });
-            }
-            return *this;
-        }
-        Tokens& toUpper() {
-            for (auto it = begin(); it != end(); ++it) {
-                std::string& str = *it;
-                std::transform(str.begin(), str.end(), str.begin(),
-                    [](unsigned char c) { return std::toupper(c); });
-            }
-            return *this;
-        }
-    };
-}
-
-std::ostream& operator<<(std::ostream& os, const utils::Tokens& t) { return t.toStream(os); }
 
 std::ostream& help(std::ostream& os)
 {
@@ -181,68 +106,6 @@ std::ostream& help(std::ostream& os)
 
 #include "utils/getopt.h"
 
-int parse_args_getopt_example_c(int argc,char *argv[])
-{
-    struct getopt_t opt;    
-    // put ':' at the starting of the string so compiler can distinguish between '?' and ':'
-    if (getopt_init(&opt,argc,argv,":if:lrx")!=0)
-        return -1; // Failed to init
-    
-    int option;
-    while((option = getopt_parse(&opt)) != -1){ //get option from the getopt() method
-      switch(option){
-         //For option i, r, l, print that these are options
-         case 'i':
-         case 'l':
-         case 'r':
-            printf("Given Option: %c\n", option);
-            break;
-         case 'f': //here f is used for some file name
-            printf("Given File: %s\n", opt.optarg);
-            break;
-         case ':':
-            printf("option needs a value\n");
-            break;
-         case '?': //used for some unknown options
-            printf("unknown option: %c\n", opt.optopt);
-            break;
-      }
-   }
-   for(; opt.optind < argc; opt.optind++){ //when some extra arguments are passed
-      printf("Given extra arguments: %s\n", argv[opt.optind]);
-   }
-   return 0;
-}
-
-int parse_args_getopt_example_cpp(int argc, char* argv[])
-{
-    utils::GetOpt opt(argc,argv,":if:lrx");
-    
-    int option;
-    while ((option = opt.parse()) != -1) { //get option from the getopt() method
-        switch (option) {
-            //For option i, r, l, print that these are options
-        case 'i':
-        case 'l':
-        case 'r':
-            printf("Given Option: %c\n", option);
-            break;
-        case 'f': //here f is used for some file name
-            printf("Given File: %s\n", opt.optarg);
-            break;
-        case ':':
-            printf("option needs a value\n");
-            break;
-        case '?': //used for some unknown options
-            printf("unknown option: %c\n", opt.optopt);
-            break;
-        }
-    }
-    for (; opt.optind < argc; opt.optind++) { //when some extra arguments are passed
-        printf("Given extra arguments: %s\n", argv[opt.optind]);
-    }
-    return 0;
-}
 
 int main(int argc,char *argv[])
 {
@@ -315,8 +178,9 @@ int main(int argc,char *argv[])
                     
                     State &newState = states[moves];
                     newState = state;
-                    newState.GetPlayer().piece[piece].Take();
-                    newState.board.set(row, col, field.set(piece, newState.GetPlayer().piece[piece].ToColor()));
+                    newState.getPlayer().piece[piece].take();
+                    // newState.board.set(row, col, field.set(piece, newState.getPlayer().piece[piece].toColor()));
+                    newState.board.set(row, col, player.piece[piece].toField());
                     
                     newState.playerTurn = (state.playerTurn + 1) % 4;
                     
