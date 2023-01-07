@@ -43,6 +43,48 @@ struct State {
         Piece piece[3];
     } player[4];
 
+    struct AvailablePosition {
+        inline uint8_t row()  const { return row_; }
+        inline uint8_t col()  const { return col_; }
+        inline uint8_t vIdx() const { return vIdx_; }
+        AvailablePosition& next() { 
+            while (valid_) {
+                if (col_==2) {
+                    valid_ = row_ < 2;
+                    if (!valid_)
+                        return *this;
+                    col_ = 0;
+                    row_++;
+                }
+                else {
+                    col_++;
+                }
+                if (state_.board.rows[row_][col_].num(vIdx_) == 0)
+                    return *this;
+            }
+            return *this; 
+        }
+        inline operator bool() const { return valid_; }
+        inline bool isValid() const { return valid_; }
+        inline bool isFree() const { return valid_ && state_.board.rows[row_][col_].num(vIdx_)==0; }
+    private:
+        friend struct State;
+        AvailablePosition(State& state, uint8_t vIdx) : row_(0), col_(0), vIdx_(vIdx), state_(state), valid_(true) {
+            if (!isFree())
+                next();
+        }
+        constexpr uint8_t V(uint8_t v) { return (v > 2 ? 0 : v); }
+        uint8_t row_;
+        uint8_t col_;
+        uint8_t vIdx_;
+        State& state_;
+        bool valid_;
+    };
+    AvailablePosition firstAvailable(uint8_t vIdx) {
+        AvailablePosition position(*this,vIdx);
+        return position;
+    }
+
     Player& getPlayer() { return player[board.playerIdx]; }
     const Player& getPlayer() const { return player[board.playerIdx]; }
 
@@ -91,19 +133,40 @@ std::ostream& operator<<(std::ostream& os, const State& state)
     return os;
 }
 
-
 std::ostream& help(std::ostream& os)
 {
     os << 
         "Available commands:\n"
         "  q[uit] : Quit\n"
         "  u[ndo] : Undo last move\n"
+        "  l[ist] : List available positions\n"
         "  <c> <r> <p> : Set piece at column (<c>=0..2),row (<r>=0..2),piece(<p>=0..2)\n";
     return os;
 }
 
 #include "utils/getopt.h"
 
+std::ostream& operator<<(std::ostream& os, const State::AvailablePosition& pos) {
+    os << '(' << (int)pos.col() << ',' << (int)pos.row() << ')';
+    return os;
+}
+
+void listPositions(State &state) {
+
+    std::cout << "Positions:\n";
+    for (uint8_t vIdx = 0; vIdx < 3; ++vIdx) {
+        std::cout << "   [" << (int)vIdx << "] :";
+        char c = ' ';
+        for (auto pos = state.firstAvailable(vIdx); pos; pos.next()) {
+            std::cout << pos;
+            c = ',';
+        }
+        if (c == ' ')
+            std::cout << " -";
+
+        std::cout << "\n";
+    }
+}
 
 int main(int argc,char *argv[])
 {
@@ -138,6 +201,7 @@ int main(int argc,char *argv[])
                 }
                 break;
             case 'h': help(std::cout); break;
+            case 'l': listPositions(state); break;
             case '0':
             case '1':
             case '2':
