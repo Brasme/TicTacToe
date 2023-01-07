@@ -43,14 +43,12 @@ struct State {
         Piece piece[3];
     } player[4];
 
-    uint8_t playerTurn;    
-
-    Player& getPlayer() { return player[playerTurn]; }
-    const Player& getPlayer() const { return player[playerTurn]; }
+    Player& getPlayer() { return player[board.playerIdx]; }
+    const Player& getPlayer() const { return player[board.playerIdx]; }
 
     State& clear(const Board& b,uint8_t turn = 0) {
         board = b;
-        playerTurn = turn;
+        board.playerIdx = turn;
         for (uint8_t playerIdx = 0; playerIdx < 4; ++playerIdx) {
             Player& p = player[playerIdx];
             const Color color(playerIdx + 1);
@@ -85,7 +83,7 @@ std::ostream& operator<<(std::ostream& os, const State& state)
 {
     state.board.toStr(os,true);
     for (uint8_t pIdx = 0; pIdx < 4; ++pIdx) {
-        os << "P#" << (int)pIdx << (pIdx == state.playerTurn ? " -> : " : "    : ");
+        os << "P#" << (int)pIdx << (pIdx == state.board.playerIdx ? " -> : " : "    : ");
         os << state.player[pIdx] << " : ";
         os << "#=" << state.board.num(Color(1 + pIdx)) << ", solved=" << state.board.solved(Color(1 + pIdx));
         os << "\n";
@@ -121,7 +119,7 @@ int main(int argc,char *argv[])
     while (!done) {
         bool ok = true;
         State& state = states[moves];
-        State::Player& player = state.player[state.playerTurn];
+        State::Player& player = state.player[state.board.playerIdx];
 
         std::cout << "--------------------------------\nMoves: " << moves << "\n" << state;
         std::cout << "%> ";
@@ -167,10 +165,8 @@ int main(int argc,char *argv[])
                     ok = player.piece[piece].num() > 0;
                     if (!ok) std::cout << "Error: Player has no more piece " << piece << "\n";
                 }
-                Field field;
                 if (ok) {
-                    field = state.board[row][col];
-                    ok = field.num(piece) == 0;
+                    ok = state.board[row][col].num(piece) == 0;
                     if (!ok) std::cout << "Error: There is already a piece on c/r = " << col << '/' << row << "\n";
                 }
                 if (ok) {
@@ -179,10 +175,9 @@ int main(int argc,char *argv[])
                     State &newState = states[moves];
                     newState = state;
                     newState.getPlayer().piece[piece].take();
-                    // newState.board.set(row, col, field.set(piece, newState.getPlayer().piece[piece].toColor()));
                     newState.board.set(row, col, player.piece[piece].toField());
                     
-                    newState.playerTurn = (state.playerTurn + 1) % 4;
+                    newState.board.playerIdx = (state.board.playerIdx + 1) % 4;
                     
                     std::cout << "Ok: Set c/r/p " << col << '/' << row << '/' << piece << "\n";
                 }
