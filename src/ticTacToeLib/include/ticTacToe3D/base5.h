@@ -44,7 +44,7 @@ namespace ttt {
         bool operator !=(const UInt8b5& o) const { return value!=value; }
         
         const DecimalsUInt8b5& getDecimals() const;
-        std::string ToStr() const;
+        std::string toStr() const;
 
         UInt8b5& setDecimal(size_t idx, const uint8_t& v);
         UInt8b5& setDecimals(const IDecimals &d) {  // Accept as non-explicit cast conversion

@@ -62,7 +62,7 @@ namespace ttt {
         return uint8ToUint8b5decimals[value];
     }
 
-    std::string UInt8b5::ToStr() const { 
+    std::string UInt8b5::toStr() const { 
         std::stringstream ss;
         ss << *this;
         return ss.str();

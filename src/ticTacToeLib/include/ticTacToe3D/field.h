@@ -26,16 +26,16 @@ namespace ttt {
         bool operator !=(const Field& o) const { return !operator==(o); }
 
         uint8_t state;
-        const Colors& ToColors() const;
-        std::string ToStr() const;
+        const Colors& toColors() const;
+        std::string toStr() const;
 
-        Field& Set(uint8_t idx, const Color& c);
-        Field& Add(const Field &f);
+        Field& set(uint8_t idx, const Color& c);
+        Field& add(const Field &f);
 
-        size_t Num() const;
-        size_t Num(uint8_t vIdx) const;
-        size_t Num(const Color& c) const;
-        size_t Num(uint8_t vIdx,const Color& c) const;
+        size_t num() const;
+        size_t num(uint8_t vIdx) const;
+        size_t num(const Color& c) const;
+        size_t num(uint8_t vIdx,const Color& c) const;
 
         constexpr uint8_t V(uint8_t i) { return i >= 5 ? 0 : i; }
         constexpr uint8_t P(uint8_t vIdx) { return vIdx==0?1:vIdx==1?5:25; }

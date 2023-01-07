@@ -3,7 +3,7 @@
 #include <sstream>
 
 namespace ttt {
-    uint8_t Color::NameToIdx(const ColorName& c) {
+    uint8_t Color::nameToIdx(const ColorName& c) {
         switch (c) {
         case ColorName::None: return 0;
         case ColorName::Yellow: return 1;
@@ -14,7 +14,13 @@ namespace ttt {
         return 0;
     }
 
-    char Color::ToChar() const {
+    Colors::Colors(const std::string& c)
+    {
+        for (size_t idx = 0;idx < 3 && idx < c.length();++idx)
+            colors[idx] = Color(c[idx]);
+    }
+
+    char Color::toChar() const {
         static const char* colorIdxChar = "-ygbr";
         return idx>=5?'-':colorIdxChar[idx];
     }
@@ -24,13 +30,13 @@ namespace ttt {
         return idx>=5?ColorName::None:idxToColorName[idx];
     }
 
-    std::ostream &operator<<(std::ostream &os, const Color &c) { os << c.ToChar(); return os; }
+    std::ostream &operator<<(std::ostream &os, const Color &c) { os << c.toChar(); return os; }
 
     Colors::Colors(const Field& f) {
-        *this = f.ToColors();
+        *this = f.toColors();
     }
 
-    std::string Colors::ToStr() const
+    std::string Colors::toStr() const
     {
         std::stringstream ss;
         ss << *this;

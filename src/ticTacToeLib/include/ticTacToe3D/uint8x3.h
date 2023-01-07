@@ -21,7 +21,7 @@ namespace ttt {
         const uint8_t& operator[](uint8_t idx) const { return v[idx]; }
         uint8_t& operator[](uint8_t idx) { return v[idx]; }
         uint8_t v[3];
-        std::string ToStr() const;
+        std::string toStr() const;
     };
     TTT_API std::ostream& operator<<(std::ostream& os, const UInt8x3& c);
 }

@@ -24,25 +24,25 @@ namespace ttt {
 
     std::ostream &operator<<(std::ostream &os, const Field &c)
     {
-        os << c.ToColors();
+        os << c.toColors();
         return os;
     }
     
-    const Colors &Field::ToColors() const
+    const Colors &Field::toColors() const
     {
         return fieldToColors[state&0x7f];
     }
 
-    Field& Field::Set(uint8_t idx, const Color& c)
+    Field& Field::set(uint8_t idx, const Color& c)
     {
-        state = Field(Colors(*this).Set(idx, c)).state;
+        state = Field(Colors(*this).set(idx, c)).state;
         return *this;
     }
 
-    Field& Field::Add(const Field& f)
+    Field& Field::add(const Field& f)
     {
-        Colors c0(ToColors());
-        const Colors& c1 = f.ToColors();
+        Colors c0(toColors());
+        const Colors& c1 = f.toColors();
         for (uint8_t vIdx = 0; vIdx < 3; ++vIdx) {
             const uint8_t cIdx = c1[vIdx].idx;
             if (cIdx > 0)
@@ -52,8 +52,8 @@ namespace ttt {
         return *this;
     }
 
-    std::string Field::ToStr() const { 
-        return Colors().ToStr(); 
+    std::string Field::toStr() const { 
+        return toColors().toStr(); 
     }
 
     /// <summary>
@@ -75,21 +75,21 @@ namespace ttt {
         0x0D44,0x0D50,0x0D80,0x0E40,0x0502,0x0905,0x0911,0x0941,0x0A01,0x0905,0x0D08,0x0D14,0x0D44,0x0E04,0x0911,0x0D14,
         0x0D20,0x0D50,0x0E10,0x0941,0x0D44,0x0D50,0x0D80,0x0E40,0x0A01,0x0E04,0x0E10,0x0E40,0x0F00,0x0003,0x0003,0x0003
     };    
-    size_t Field::Num() const
+    size_t Field::num() const
     {
         return (fieldToNum[state]>>10)&0x3;
     }
-    size_t Field::Num(uint8_t vIdx) const
+    size_t Field::num(uint8_t vIdx) const
     {
         return fieldToColors[state][vIdx].idx > 0 ? 1 : 0;
     }
 
-    size_t Field::Num(const Color& c) const
+    size_t Field::num(const Color& c) const
     {
         return (fieldToNum[state] >> (c.idx*2))&0x3;
     }
 
-    size_t Field::Num(uint8_t vIdx,const Color& c) const
+    size_t Field::num(uint8_t vIdx,const Color& c) const
     {
         return fieldToColors[state][vIdx].idx == c.idx ? 1 : 0;        
     }

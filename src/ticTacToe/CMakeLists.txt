@@ -7,7 +7,7 @@ include(CMakeDependentOption)
 include(GNUInstallDirs)
 
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} ticTacToe3DLib)
+target_link_libraries(${PROJECT_NAME} ticTacToe3DLib utils)
 
 if(BUILD_SHARED_LIBS)
 add_custom_command (TARGET ${PROJECT_NAME} POST_BUILD
