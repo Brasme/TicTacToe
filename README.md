@@ -2,6 +2,11 @@
 
 Version 1.0.0 - Playable and useful for future AI/analyze
 
+## How yo build
+ - cmake 
+ - compatible with Visual Studio (windows), gcc (mingw & linux)
+
+## Running application
 So far - just a console app :
 
 
